@@ -86,7 +86,9 @@ const App: React.FC = () => {
         <div className='grid-container'>
         <Header OpenSidebar={OpenSidebar} />
           <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
+          <UserProvider>
           <Home />
+          </UserProvider>
         </div>
         </>
       } />

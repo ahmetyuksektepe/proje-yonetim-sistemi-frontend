@@ -1,3 +1,4 @@
+// src/pages/Home.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -14,6 +15,7 @@ import {
   TextField,
   Stack,
 } from '@mui/material';
+import { useUser } from './context/UserContext';
 
 const Home: React.FC = () => {
   const [projCount, setProjCount] = useState<number | null>(null);
@@ -25,6 +27,10 @@ const Home: React.FC = () => {
   const [open, setOpen] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDate, setProjectDate] = useState('');
+
+  /* Rol kontrolü */
+  const { role } = useUser();
+  const canManage = role === 'PROJECT_MANAGER';
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -52,7 +58,7 @@ const Home: React.FC = () => {
         projectDate, // yyyy-MM-dd bekleniyor
       })
       .then(() => {
-        setProjCount((c) => (c ?? 0) + 1); // sayacı anında güncelle
+        setProjCount((c) => (c ?? 0) + 1);
         setOpen(false);
         setProjectName('');
         setProjectDate('');
@@ -100,11 +106,16 @@ const Home: React.FC = () => {
         </div>
 
         {/* ────────── “PROJE EKLE” KART-BUTONU ────────── */}
-        <button className="card add-card" onClick={() => setOpen(true)}>
-          <div className="card-inner" style={{ justifyContent: 'center' }}>
-            <h3>➕ PROJE&nbsp;EKLE</h3>
-          </div>
-        </button>
+        {canManage && (
+          <button
+            className="card add-card"
+            onClick={() => setOpen(true)}
+          >
+            <div className="card-inner" style={{ justifyContent: 'center' }}>
+              <h3>➕ PROJE&nbsp;EKLE</h3>
+            </div>
+          </button>
+        )}
       </div>
 
       {/* ────────── MODAL ────────── */}
@@ -129,7 +140,11 @@ const Home: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setOpen(false)}>İptal</Button>
-          <Button variant="contained" onClick={handleSave}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!canManage}
+          >
             Kaydet
           </Button>
         </DialogActions>
