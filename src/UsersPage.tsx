@@ -1,4 +1,3 @@
-// src/pages/UsersPage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -21,7 +20,7 @@ type User = {
   status: Status;
   projectId: number | null;
   gorevId:   number | null;
-  taskName?: string | null;      // liste sayfası doldurur
+  taskName?: string | null;      
 };
 
 const roleOptions = [
@@ -40,16 +39,13 @@ const UsersPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
 
-  /* Düzenle */
   const [editOpen, setEditOpen] = useState(false);
   const [curr, setCurr]         = useState<User | null>(null);
   const [role, setRole]         = useState<Role>('DEVELOPER');
   const [status, setStatus]     = useState<Status>('AVAILABLE');
 
-  /* Sil */
   const [delOpen, setDelOpen] = useState(false);
 
-  /* -------- Veri çekimi -------- */
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -74,7 +70,6 @@ const UsersPage: React.FC = () => {
     fetchAll();
   }, []);
 
-  /* ---------- Düzenle ---------- */
   const handleEditClick = (u: User) => {
     setCurr(u);
     setRole(u.role);
@@ -86,7 +81,6 @@ const UsersPage: React.FC = () => {
     if (!curr) return;
 
     axios.put('/api/users', {
-      /* Değişmeyen alanları koru */
       id: curr.id,
       name: curr.name,
       surname: curr.surname,
@@ -95,7 +89,6 @@ const UsersPage: React.FC = () => {
       projectId: curr.projectId,
       gorevId:   curr.gorevId,
 
-      /* Sadece rol & durum güncellenir */
       role,
       status,
     })
@@ -107,7 +100,6 @@ const UsersPage: React.FC = () => {
     .catch(err => alert(err.response?.data?.message || 'Kaydedilemedi'));
   };
 
-  /* ---------- Sil ---------- */
   const handleDeleteClick = (u: User) => { setCurr(u); setDelOpen(true); };
   const confirmDelete = () => {
     if (!curr) return;
@@ -135,7 +127,7 @@ const UsersPage: React.FC = () => {
         ))}
       </div>
 
-      {/* -------- Düzenle -------- */}
+      {}
       <Dialog open={editOpen} onClose={()=>setEditOpen(false)}>
         <DialogTitle>Kullanıcıyı Düzenle</DialogTitle>
         <DialogContent dividers>
@@ -167,7 +159,7 @@ const UsersPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* -------- Sil -------- */}
+      {}
       <Dialog open={delOpen} onClose={()=>setDelOpen(false)}>
         <DialogTitle>Emin misiniz?</DialogTitle>
         <DialogContent dividers>

@@ -6,9 +6,8 @@ import {
   InputLabel, Select, MenuItem,
 } from '@mui/material';
 
-import TaskCard, { TaskStatus } from './components/TaskCard';   // yolu uyarlayın
+import TaskCard, { TaskStatus } from './components/TaskCard';   
 
-/* ---------- Tipler ---------- */
 type Task = {
   id: number;
   task_name: string;
@@ -21,7 +20,6 @@ type Task = {
 };
 type User = { id: number; name: string; surname: string };
 
-/* ---------- Sabitler ---------- */
 const statusOptions = [
   { label: 'YAPILACAK', value: 'TODO' },
   { label: 'YAPIM AŞAMASINDA', value: 'IN_PROGRESS' },
@@ -29,20 +27,17 @@ const statusOptions = [
   { label: 'TAMAMLANDI', value: 'FINISHED' },
 ];
 
-/* =================================================================== */
 const TasksPage: React.FC = () => {
   const viewerRole = (localStorage.getItem('user_role') as 'PROJECT_MANAGER' | 'DEVELOPER' | 'GUEST') ?? 'GUEST';
   const canEdit   = viewerRole === 'PROJECT_MANAGER' || viewerRole === 'DEVELOPER';
   const canDelete = viewerRole === 'PROJECT_MANAGER';
   const devLimited = viewerRole === 'DEVELOPER';
 
-  /* -------- State -------- */
   const [tasks,  setTasks]  = useState<Task[]>([]);
   const [users,  setUsers]  = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
 
-  /* Düzenle popup */
   const [editOpen, setEditOpen] = useState(false);
   const [curr, setCurr]         = useState<Task | null>(null);
   const [name, setName]         = useState('');
@@ -50,10 +45,8 @@ const TasksPage: React.FC = () => {
   const [status, setStatus]     = useState<TaskStatus>('TODO');
   const [user, setUser]         = useState<number|''>('');
 
-  /* Sil popup */
   const [delOpen, setDelOpen] = useState(false);
 
-  /* -------- Veri Çekimi -------- */
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -86,9 +79,8 @@ const TasksPage: React.FC = () => {
     fetchAll();
   }, []);
 
-  /* -------- Düzenle -------- */
   const handleEditClick = (t: Task) => {
-    if (!canEdit) return;          // GUEST engeli
+    if (!canEdit) return;          
     setCurr(t);
     setName(t.task_name);
     setDesc(t.task_description);
@@ -121,9 +113,8 @@ const TasksPage: React.FC = () => {
     .catch(err => alert(err.response?.data?.message || 'Kaydedilemedi'));
   };
 
-  /* -------- Sil -------- */
   const handleDeleteClick = (t: Task) => {
-    if (!canDelete) return;     // developer & guest silemez
+    if (!canDelete) return;     
     setCurr(t);
     setDelOpen(true);
   };
@@ -138,7 +129,6 @@ const TasksPage: React.FC = () => {
       .catch(err => alert(err.response?.data?.message || 'Silinemedi'));
   };
 
-  /* -------- JSX -------- */
   return (
     <main className="main-container">
       <div className="main-title"><h3>GÖREVLER</h3></div>
@@ -159,7 +149,7 @@ const TasksPage: React.FC = () => {
         ))}
       </div>
 
-      {/* -------- Düzenle Dialog -------- */}
+      {}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>Görevi Düzenle</DialogTitle>
         <DialogContent dividers>
@@ -169,7 +159,7 @@ const TasksPage: React.FC = () => {
               fullWidth
               value={name}
               onChange={e=>setName(e.target.value)}
-              disabled={devLimited}          /* DEV ismi değiştiremez */
+              disabled={devLimited}          
             />
             <TextField
               label="Açıklama"
@@ -208,7 +198,7 @@ const TasksPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* -------- Sil Dialog -------- */}
+      {}
       <Dialog open={delOpen} onClose={() => setDelOpen(false)}>
         <DialogTitle>Emin misiniz?</DialogTitle>
         <DialogContent dividers>

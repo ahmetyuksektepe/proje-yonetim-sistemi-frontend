@@ -1,4 +1,3 @@
-// src/pages/ProjectsPage.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -41,16 +40,13 @@ const ProjectsPage: React.FC = () => {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
 
-  /* Düzenle pop-up */
   const [editOpen, setEditOpen] = useState(false);
   const [current, setCurrent]   = useState<Project | null>(null);
   const [editName, setEditName] = useState('');
   const [editDate, setEditDate] = useState('');
 
-  /* Sil pop-up */
   const [delOpen, setDelOpen] = useState(false);
 
-  /* Görev ekle pop-up */
   const [addOpen, setAddOpen]        = useState(false);
   const [taskName, setTaskName]      = useState('');
   const [taskDesc, setTaskDesc]      = useState('');
@@ -59,7 +55,6 @@ const ProjectsPage: React.FC = () => {
   const [users, setUsers]            = useState<User[]>([]);
   const [addProject, setAddProject]  = useState<Project | null>(null);
 
-  /* Projeleri getir */
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (token) axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
@@ -70,7 +65,6 @@ const ProjectsPage: React.FC = () => {
       .finally(() => setLoading(false));
   }, []);
 
-  /* — Düzenle — */
   const handleEditClick = (p: Project) => {
     setCurrent(p);
     setEditName(p.projectName);
@@ -89,7 +83,6 @@ const ProjectsPage: React.FC = () => {
       .catch((err) => alert(err.response?.data?.message || 'Güncelleme başarısız'));
   };
 
-  /* — Sil — */
   const handleDeleteClick = (p: Project) => { setCurrent(p); setDelOpen(true); };
   const confirmDelete = () => {
     if (!current) return;
@@ -98,17 +91,15 @@ const ProjectsPage: React.FC = () => {
       .catch((err) => alert(err.response?.data?.message || 'Silinemedi'));
   };
 
-  /* — Görev ekle — */
   const handleAddClick = (p: Project) => {
     setAddProject(p);
     setTaskName(''); setTaskDesc(''); setTaskStatus('TODO'); setTaskUser('');
     setAddOpen(true);
 
-    /* Kullanıcı listesi lazy-load */
     if (users.length === 0) {
       axios.get<User[]>('/api/users')
         .then((res) => setUsers(res.data))
-        .catch(() => {/* hata sessiz geç */});
+        .catch(() => {});
     }
   };
 
@@ -145,7 +136,7 @@ const ProjectsPage: React.FC = () => {
         ))}
       </div>
 
-      {/* Düzenle */}
+      {}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>Projeyi Düzenle</DialogTitle>
         <DialogContent dividers>
@@ -162,7 +153,7 @@ const ProjectsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Sil */}
+      {}
       <Dialog open={delOpen} onClose={() => setDelOpen(false)}>
         <DialogTitle>Emin misiniz?</DialogTitle>
         <DialogContent dividers>{current?.projectName} silinecek.</DialogContent>
@@ -172,7 +163,7 @@ const ProjectsPage: React.FC = () => {
         </DialogActions>
       </Dialog>
 
-      {/* Görev Ekle */}
+      {}
       <Dialog open={addOpen} onClose={() => setAddOpen(false)}>
         <DialogTitle>{addProject?.projectName} → Görev Ekle</DialogTitle>
         <DialogContent dividers>

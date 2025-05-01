@@ -204,23 +204,23 @@ body {
     display: inline;
   }
 }
-/* Small <= 768px */
+
   
 .charts {
   display: flex;
-  flex-wrap: wrap;              /* taşan kart alta geçsin            */
-  gap: 0.8rem;                  /* kartlar arası boşluk              */
-  justify-content: flex-start;  /* boşluk kartların arasında değil, sonda kalsın */
+  flex-wrap: wrap;              
+  gap: 0.8rem;                  
+  justify-content: flex-start;  
 }
 
-/* Ekran daralınca boşluğu biraz açmak istersen */
+
 @media (max-width: 600px) {
   .charts {
     gap: 1rem;
   }
 }
 
-/* Extra Small <= 576px */
+
 
 @media screen and (max-width: 576px) {
   .hedaer-left {
@@ -228,23 +228,20 @@ body {
   }
 }
 
-/*────────────────  PROFIL ORTALAMA  ────────────────*/
+
 .profile-wrapper {
-  /* grid-container içindeki "main" alanını kaplasın */
   grid-area: main;
 
-  /* Kartı hem yatay hem dikey ortala */
   display: flex;
   justify-content: center;
   align-items: center;
 
-  padding: 20px;     /* sign-in kartıyla tutarlı boşluk */
-  overflow-y: auto;  /* içeri taşarsa scroll */
+  padding: 20px;     
+  overflow-y: auto;  
 }
 
-/* Sidebar mobilde gizlendiğinde de ortalı kalsın */
 @media (max-width: 992px) {
   .profile-wrapper {
-    grid-area: 2 / 1 / 3 / 2;   /* tek sütun layout’ta da çalışsın */
+    grid-area: 2 / 1 / 3 / 2;  
   }
 }

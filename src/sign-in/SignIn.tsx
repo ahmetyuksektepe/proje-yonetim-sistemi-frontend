@@ -63,9 +63,9 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 }));
 
 export default function SignIn(props: { disableCustomTheme?: boolean }) {
-  const navigate = useNavigate();                       //  <-- yeni
-  const [email, setEmail]       = React.useState('');   //  <-- yeni
-  const [password, setPassword] = React.useState('');   //  <-- yeni
+  const navigate = useNavigate();                       
+  const [email, setEmail]       = React.useState('');   
+  const [password, setPassword] = React.useState('');   
   const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
@@ -82,10 +82,10 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
   };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();                 // formun default submit’ini engelle
+    event.preventDefault();                 
   
-    // geçerleme (isteğe bağlı)
-    if (!validateInputs()) return;          // validateInputs true/false dönsün
+   
+    if (!validateInputs()) return;          
   
     try {
       const res = await axios.post('/api/users/login', {
@@ -93,15 +93,15 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
         password,
       });
     
-      /* -------------- yeni ------------------ */
-      const { token, id, role } = res.data;          // backend artık üçlü dönüyor
+  
+      const { token, id, role } = res.data;       
     
-      localStorage.setItem('auth_token', token);     // Bearer token
-      localStorage.setItem('user_id',    id.toString());   // <-- uzun sayı → string
+      localStorage.setItem('auth_token', token);     
+      localStorage.setItem('user_id',    id.toString());  
       localStorage.setItem('user_role',  role);
     
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-      /* -------------------------------------- */
+    
     
       navigate('/home');
     } catch (err: any) {
@@ -169,7 +169,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                value={email}                           //  <-- yeni
+                value={email}                         
                 onChange={(e) => setEmail(e.target.value)}
                 error={emailError}
                 helperText={emailErrorMessage}
@@ -190,7 +190,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                value={password}                        //  <-- yeni
+                value={password}                        
                 onChange={(e) => setPassword(e.target.value)}
                 error={passwordError}
                 helperText={passwordErrorMessage}

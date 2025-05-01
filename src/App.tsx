@@ -71,7 +71,7 @@ const App: React.FC = () => {
                 <Header OpenSidebar={OpenSidebar} />
                 <Sidebar openSidebarToggle={openSidebarToggle} OpenSidebar={OpenSidebar} />
 
-                {/* ───── yalnız profil için ───── */}
+                {}
                 <div className="profile-wrapper">
                   <ProfilePage />
                 </div>

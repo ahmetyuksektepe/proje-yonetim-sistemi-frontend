@@ -143,7 +143,7 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
     try {
       const response = await axios.post('/api/users/register', payload);
       alert('Kayıt başarılı!');
-      navigate('/giris'); // Başarılı kayıt sonrası yönlendirme
+      navigate('/giris'); 
     } catch (error: any) {
       console.error(error);
       alert('Kayıt sırasında hata oluştu.');

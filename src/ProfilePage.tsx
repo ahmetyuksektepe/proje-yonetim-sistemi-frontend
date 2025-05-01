@@ -22,7 +22,6 @@ import { styled } from '@mui/material/styles';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 import EditIcon from '@mui/icons-material/Edit';
 
-/* ---------- Tipler ---------- */
 type Role   = 'DEVELOPER' | 'PROJECT_MANAGER' | 'GUEST';
 type Status = 'AVAILABLE' | 'UNAVAILABLE';
 interface User {
@@ -31,7 +30,6 @@ interface User {
 }
 interface Task { id:number; task_name:string; status:string; assignedUserId:number }
 
-/* ---------- Sabit seçenekler ---------- */
 const roleOpts = [
   { label: 'GELİŞTİRİCİ',       value: 'DEVELOPER' },
   { label: 'PROJE YÖNETİCİSİ',  value: 'PROJECT_MANAGER' },
@@ -42,13 +40,11 @@ const statusOpts = [
   { label: 'ÇALIŞIYOR', value: 'UNAVAILABLE' },
 ];
 
-/* ---------- Yardımcı ---------- */
 const getLoggedUserId = (): number | null => {
   const idStr = localStorage.getItem('user_id');
   return idStr ? Number(idStr) : null;
 };
 
-/* ---------- Stil ---------- */
 const PageContainer = styled(Box)(({ theme }) => ({
   height: '100vh',
   display: 'flex',
@@ -66,28 +62,23 @@ const InfoCard = styled(Card)(({ theme }) => ({
       : 'hsla(220,30%,5%,.1) 0 4px 12px',
 }));
 
-/* =================================================================== */
 const ProfilePage: React.FC = () => {
   const userId = getLoggedUserId();
   const viewerRole: Role = (localStorage.getItem('user_role') as Role) ?? 'GUEST';
 
-  /* izinler */
   const canOpenDialog   = viewerRole === 'PROJECT_MANAGER' || viewerRole === 'DEVELOPER';
   const canChangeRole   = viewerRole === 'PROJECT_MANAGER';
   const canChangeStatus = viewerRole !== 'GUEST';
 
-  /* state’ler */
   const [user,  setUser]  = useState<User | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [error,   setError]   = useState('');
 
-  /* edit popup */
   const [open,   setOpen]   = useState(false);
   const [role,   setRole]   = useState<Role>('DEVELOPER');
   const [status, setStatus] = useState<Status>('AVAILABLE');
 
-  /* -------- Veri çekimi -------- */
   useEffect(() => {
     if (!userId) { setError('Kullanıcı bulunamadı'); setLoading(false); return; }
 
@@ -108,11 +99,9 @@ const ProfilePage: React.FC = () => {
     .finally(() => setLoading(false));
   }, [userId]);
 
-  /* -------- Kaydet -------- */
   const save = () => {
     if (!user) return;
 
-    /* only allowed fields */
     const payload: Partial<User> = { id: user.id };
     if (canChangeRole)   payload.role   = role;
     if (canChangeStatus) payload.status = status;
@@ -131,7 +120,6 @@ const ProfilePage: React.FC = () => {
       .catch(e => alert(e.response?.data?.message || 'Kaydedilemedi'));
   };
 
-  /* -------- JSX -------- */
   if (loading) return <p>Yükleniyor…</p>;
   if (error || !user) return <p style={{ color:'tomato' }}>{error || 'Hata'}</p>;
 
@@ -182,7 +170,7 @@ const ProfilePage: React.FC = () => {
         </CardContent>
       </InfoCard>
 
-      {/* -------- Düzenle Pop-up -------- */}
+      {}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Profilimi Düzenle</DialogTitle>
         <DialogContent dividers>

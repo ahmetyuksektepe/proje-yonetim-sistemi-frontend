@@ -23,12 +23,10 @@ const Home: React.FC = () => {
   const [userCount, setUserCount] = useState<number | null>(null);
   const [error, setError] = useState('');
 
-  /* ────────── Proje ekle modalı için durum ────────── */
   const [open, setOpen] = useState(false);
   const [projectName, setProjectName] = useState('');
   const [projectDate, setProjectDate] = useState('');
 
-  /* Rol kontrolü */
   const { role } = useUser();
   const canManage = role === 'PROJECT_MANAGER';
 
@@ -50,12 +48,11 @@ const Home: React.FC = () => {
     });
   }, []);
 
-  /* ────────── Proje ekle işlemi ────────── */
   const handleSave = () => {
     axios
       .put('/api/projects', {
         projectName,
-        projectDate, // yyyy-MM-dd bekleniyor
+        projectDate, 
       })
       .then(() => {
         setProjCount((c) => (c ?? 0) + 1);
@@ -78,7 +75,7 @@ const Home: React.FC = () => {
       {error && <p style={{ color: 'tomato' }}>{error}</p>}
 
       <div className="main-cards">
-        {/* PROJE SAYISI */}
+        {}
         <div className="card">
           <div className="card-inner">
             <h3>PROJELER</h3>
@@ -87,7 +84,7 @@ const Home: React.FC = () => {
           <h1>{projCount ?? '...'}</h1>
         </div>
 
-        {/* GÖREV SAYISI */}
+        {}
         <div className="card">
           <div className="card-inner">
             <h3>GÖREVLER</h3>
@@ -96,7 +93,7 @@ const Home: React.FC = () => {
           <h1>{taskCount ?? '...'}</h1>
         </div>
 
-        {/* ÇALIŞAN SAYISI */}
+        {}
         <div className="card">
           <div className="card-inner">
             <h3>ÇALIŞANLAR</h3>
@@ -105,7 +102,7 @@ const Home: React.FC = () => {
           <h1>{userCount ?? '...'}</h1>
         </div>
 
-        {/* ────────── “PROJE EKLE” KART-BUTONU ────────── */}
+        {}
         {canManage && (
           <button
             className="card add-card"
@@ -118,7 +115,7 @@ const Home: React.FC = () => {
         )}
       </div>
 
-      {/* ────────── MODAL ────────── */}
+      {}
       <Dialog open={open} onClose={() => setOpen(false)}>
         <DialogTitle>Yeni Proje</DialogTitle>
         <DialogContent dividers>

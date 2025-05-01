@@ -1,4 +1,3 @@
-// src/pages/UserDetailsPage.tsx
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
@@ -32,7 +31,7 @@ const statusOpts = [
 ];
 
 const UserDetailsPage: React.FC = () => {
-  const { id } = useParams();            // /details/:id
+  const { id } = useParams();            
   const navigate = useNavigate();
   const [user, setUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
@@ -40,7 +39,7 @@ const UserDetailsPage: React.FC = () => {
   const [loading, setLoading]   = useState(true);
   const [error, setError]       = useState('');
 
-  /* --- Edit popup state --- */
+
   const [open, setOpen] = useState(false);
   const [role, setRole] = useState<Role>('DEVELOPER');
   const [status, setStatus] = useState<Status>('AVAILABLE');
@@ -51,7 +50,7 @@ const UserDetailsPage: React.FC = () => {
         const uRes = await axios.get<User>(`/api/users/${id}`);
         const [projRes, taskRes] = await Promise.all([
           axios.get<Project[]>(`/api/projects/user/${id}`).catch(()=>({data:[]}))
-          /* backend'de böyle bir endpoint yoksa tek tek filtreleyebilirsin */,
+          ,
           axios.get<Task[]>(`/api/tasks/user/${id}`).catch(()=>({data:[]}))
         ]);
         setUser(uRes.data);
@@ -123,7 +122,7 @@ const UserDetailsPage: React.FC = () => {
         </CardContent>
       </Card>
 
-      {/* Düzenle popup */}
+      {}
       <Dialog open={open} onClose={()=>setOpen(false)}>
         <DialogTitle>Kullanıcıyı Düzenle</DialogTitle>
         <DialogContent dividers>
