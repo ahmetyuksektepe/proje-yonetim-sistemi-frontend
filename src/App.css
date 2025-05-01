@@ -156,7 +156,8 @@ body {
 }
 
 .card:nth-child(4) {
-  background-color: #d50000;
+  background-color: grey;
+  opacity: 25;
 }
 
 .card-inner {
@@ -224,5 +225,26 @@ body {
 @media screen and (max-width: 576px) {
   .hedaer-left {
     display: none;
+  }
+}
+
+/*────────────────  PROFIL ORTALAMA  ────────────────*/
+.profile-wrapper {
+  /* grid-container içindeki "main" alanını kaplasın */
+  grid-area: main;
+
+  /* Kartı hem yatay hem dikey ortala */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;     /* sign-in kartıyla tutarlı boşluk */
+  overflow-y: auto;  /* içeri taşarsa scroll */
+}
+
+/* Sidebar mobilde gizlendiğinde de ortalı kalsın */
+@media (max-width: 992px) {
+  .profile-wrapper {
+    grid-area: 2 / 1 / 3 / 2;   /* tek sütun layout’ta da çalışsın */
   }
 }

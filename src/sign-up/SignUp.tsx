@@ -136,8 +136,10 @@ export default function SignUp(props: { disableCustomTheme?: boolean }) {
       mail: data.get('mail'),
       password: data.get('password'),
       phone: data.get('phone'),
+      role: "DEVELOPER",
+      status: "AVAILABLE"
     };
-
+    
     try {
       const response = await axios.post('/api/users/register', payload);
       alert('Kayıt başarılı!');

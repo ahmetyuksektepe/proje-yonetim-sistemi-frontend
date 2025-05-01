@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 import {
   Card as MuiCard,
   CardContent,
@@ -9,16 +9,24 @@ import {
   IconButton,
   Link,
   Stack,
-} from "@mui/material";
-import { styled } from "@mui/material/styles";
-import EditIcon from "@mui/icons-material/Edit";
-import { Link as RouterLink } from "react-router-dom";
+} from '@mui/material';
+import { styled } from '@mui/material/styles';
+import EditIcon from '@mui/icons-material/Edit';
+import DeleteIcon from '@mui/icons-material/Delete';
+import HourglassEmptyIcon from '@mui/icons-material/HourglassEmpty';
+import AutorenewIcon from '@mui/icons-material/Autorenew';
+import SearchIcon from '@mui/icons-material/Search';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+import { Link as RouterLink } from 'react-router-dom';
+
+export type TaskStatus = 'TODO' | 'IN_PROGRESS' | 'NEEDS_REVIEW' | 'FINISHED';
+type Role = 'PROJECT_MANAGER' | 'DEVELOPER' | 'GUEST';
 
 interface Task {
   id: number;
   task_name: string;
   task_description: string;
-  status: string;
+  status: TaskStatus;
   assignedProjectId: number | null;
   assignedUserId: number | null;
 }
@@ -28,92 +36,138 @@ interface TaskCardProps {
   projectName?: string | null;
   userName?: string | null;
   onEdit?: (task: Task) => void;
+  onDelete?: (task: Task) => void;
 }
 
-/*
- * Görünümü daraltıp (maxWidth ↓) hafif daha uzun göstermek (minHeight ↑) ve
- * içerik altına ek boşluk eklemek için güncelledik.
- */
+/* Stil ---------------------------------------------------------------*/
 const Card = styled(MuiCard)(({ theme }) => {
-  const isDark = theme.palette.mode === "dark";
+  const d = theme.palette.mode === 'dark';
   return {
-    position: "relative",
-    overflow: "hidden",
-    width: "100%",
-    maxWidth: 380,      // önceki karttan daha dar
-    minHeight: 190,     // biraz daha uzun
+    position: 'relative',
+    width: '100%',
+    maxWidth: 380,
+    minHeight: 190,
     borderRadius: theme.shape.borderRadius * 2,
-    backdropFilter: "blur(3px)",
-    background: isDark
-      ? "radial-gradient(ellipse at 50% 50%, rgba(75,85,99,0.40) 0%, rgba(31,41,55,0.85) 100%)"
-      : "radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.6) 0%, rgba(238,242,247,0.95) 100%)",
+    overflow: 'hidden',
+    backdropFilter: 'blur(3px)',
+    background: d
+      ? 'radial-gradient(ellipse at 50% 50%, rgba(75,85,99,.4) 0%, rgba(31,41,55,.85) 100%)'
+      : 'radial-gradient(ellipse at 50% 50%, rgba(255,255,255,.6) 0%, rgba(238,242,247,.95) 100%)',
     boxShadow:
-      "hsla(220, 30%, 5%, 0.25) 0px 4px 12px 0px, hsla(220, 25%, 10%, 0.12) 0px 15px 25px -5px",
-    transition: "transform 150ms ease, box-shadow 150ms ease",
-    "&:hover": {
-      transform: "scale(1.02)",
+      'hsla(220,30%,5%,.25) 0 4px 12px, hsla(220,25%,10%,.12) 0 15px 25px -5px',
+    transition: 'transform .15s, box-shadow .15s',
+    '&:hover': {
+      transform: 'scale(1.02)',
       boxShadow:
-        "hsla(220, 30%, 5%, 0.35) 0px 6px 18px 0px, hsla(220, 25%, 10%, 0.20) 0px 22px 35px -5px",
+        'hsla(220,30%,5%,.35) 0 6px 18px, hsla(220,25%,10%,.2) 0 22px 35px -5px',
     },
   };
 });
 
-const StatusChip = styled(Chip)(({ theme }) => ({
+/* Status Chip --------------------------------------------------------*/
+const StyledChip = styled(Chip)<{ bgcolor: string; fg: string }>(({ bgcolor, fg }) => ({
+  backgroundColor: bgcolor,
+  color: fg,
   fontWeight: 600,
-  letterSpacing: 0.5,
-  textTransform: "uppercase",
-  backgroundColor: theme.palette.mode === "dark" ? "#3e4c5d" : "#e8eef7",
-  color: theme.palette.mode === "dark" ? "#c5d1e1" : theme.palette.text.secondary,
+  textTransform: 'uppercase',
 }));
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, projectName, userName, onEdit }) => (
-  <Card>
-    <CardHeader
-      title={<Typography variant="h6" sx={{ fontWeight: 600 }}>{task.task_name}</Typography>}
-      action={
-        <IconButton aria-label="Düzenle" onClick={() => onEdit?.(task)} size="small">
-          <EditIcon fontSize="small" />
-        </IconButton>
-      }
-      sx={{ mb: -1 }}
-    />
+const statusMap = {
+  TODO: {
+    label: 'YAPILACAK',
+    bgcolor: '#fff3cd',
+    fg: '#b28704',
+    icon: <HourglassEmptyIcon sx={{ fontSize: 16 }} />,
+  },
+  IN_PROGRESS: {
+    label: 'YAPIM AŞAMASINDA',
+    bgcolor: '#d0f5e0',
+    fg: '#1b5e20',
+    icon: <AutorenewIcon sx={{ fontSize: 16 }} />,
+  },
+  NEEDS_REVIEW: {
+    label: 'İNCELEME',
+    bgcolor: '#cfd8dc',
+    fg: '#37474f',
+    icon: <SearchIcon sx={{ fontSize: 16 }} />,
+  },
+  FINISHED: {
+    label: 'TAMAMLANDI',
+    bgcolor: '#c8e6c9',
+    fg: '#256029',
+    icon: <CheckCircleIcon sx={{ fontSize: 16 }} />,
+  },
+} as const;
 
-    <CardContent sx={{ pb: 2 /* alt boşluğu arttır */ }}>
-      {task.task_description && (
-        <Typography variant="body2" sx={{ mb: 1 }}>
-          {task.task_description}
-        </Typography>
-      )}
+/* Component ----------------------------------------------------------*/
+const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  projectName,
+  userName,
+  onEdit,
+  onDelete,
+}) => {
+  const role = (localStorage.getItem('user_role') as Role) ?? 'GUEST';
+  const canEdit = role === 'PROJECT_MANAGER' || role === 'DEVELOPER';
+  const canDelete = role === 'PROJECT_MANAGER';
 
-      <Stack direction="column" spacing={0.75 /* satırlar arası biraz aç */}>
-        {task.assignedProjectId && (
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              Atandığı Proje:
-            </Typography>{" "}
-            {projectName ? (
-              <Link component={RouterLink} to={`/home/projeler/${task.assignedProjectId}`}>{projectName}</Link>
-            ) : (
-              <Typography variant="caption">(yükleniyor…)</Typography>
+  const s = statusMap[task.status];
+
+  return (
+    <Card>
+      <CardHeader
+        title={<Typography variant="h6" sx={{ fontWeight: 600 }}>{task.task_name}</Typography>}
+        action={
+          <>
+            {canEdit && (
+              <IconButton size="small" aria-label="Düzenle" onClick={() => onEdit?.(task)}>
+                <EditIcon fontSize="small" />
+              </IconButton>
             )}
-          </Box>
-        )}
-        {task.assignedUserId && (
-          <Box>
-            <Typography variant="caption" color="text.secondary">
-              Atanan Kişi:
-            </Typography>{" "}
-            {userName ? (
-              <Link component={RouterLink} to={`/home/calisanlar/${task.assignedUserId}`}>{userName}</Link>
-            ) : (
-              <Typography variant="caption">(yükleniyor…)</Typography>
+            {canDelete && (
+              <IconButton
+                size="small"
+                aria-label="Sil"
+                onClick={() => onDelete?.(task)}
+                sx={{ color: '#d32f2f', ml: 0.5 }}
+              >
+                <DeleteIcon fontSize="small" />
+              </IconButton>
             )}
-          </Box>
+          </>
+        }
+        sx={{ mb: -1 }}
+      />
+
+      <CardContent sx={{ pb: 2 }}>
+        {task.task_description && (
+          <Typography variant="body2" sx={{ mb: 1 }}>{task.task_description}</Typography>
         )}
-        <StatusChip size="small" label={task.status} />
-      </Stack>
-    </CardContent>
-  </Card>
-);
+
+        <Stack direction="column" spacing={0.75}>
+          {task.assignedProjectId && (
+            <Box>
+              <Typography variant="caption" color="text.secondary">Atandığı Proje:</Typography>{' '}
+              {projectName
+                ? <Link component={RouterLink} to={`/home/projeler/${task.assignedProjectId}`}>{projectName}</Link>
+                : <Typography variant="caption">(yükleniyor…)</Typography>}
+            </Box>
+          )}
+
+          {task.assignedUserId && (
+            <Box>
+              <Typography variant="caption" color="text.secondary">Atanan Kişi:</Typography>{' '}
+              {userName
+                ? <Link component={RouterLink} to={`/home/calisanlar/${task.assignedUserId}`}>{userName}</Link>
+                : <Typography variant="caption">(yükleniyor…)</Typography>}
+            </Box>
+          )}
+
+          <StyledChip size="small" {...s} />
+        </Stack>
+      </CardContent>
+    </Card>
+  );
+};
 
 export default TaskCard;

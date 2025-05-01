@@ -88,29 +88,30 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
     if (!validateInputs()) return;          // validateInputs true/false dönsün
   
     try {
-      const res = await axios.post('/api/users/login', {   // proxy ile “/api…”
+      const res = await axios.post('/api/users/login', {
         mail: email,
         password,
       });
-  
-      // backend "token" dö­ne­ri assume:
-      const token = res.data.token;
-  
-      // tarayıcıda sakla (localStorage)  ────────────────────────────────────┐
-      localStorage.setItem('auth_token', token);                            // │
-      // tüm axios isteklerine ekle  ────────────────────────────────────────┘
+    
+      /* -------------- yeni ------------------ */
+      const { token, id, role } = res.data;          // backend artık üçlü dönüyor
+    
+      localStorage.setItem('auth_token', token);     // Bearer token
+      localStorage.setItem('user_id',    id.toString());   // <-- uzun sayı → string
+      localStorage.setItem('user_role',  role);
+    
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-  
-      // başarılı → /home yönlendir
+      /* -------------------------------------- */
+    
       navigate('/home');
     } catch (err: any) {
       console.error('Login error:', err.response || err);
-      // basit feedback
       setPasswordError(true);
       setPasswordErrorMessage(
         err.response?.data?.message || 'Giriş başarısız.'
       );
     }
+    
   };
   
 
@@ -232,7 +233,7 @@ export default function SignIn(props: { disableCustomTheme?: boolean }) {
            <Typography sx={{ textAlign: 'center' }}>
               Hesabınız yok mu?{' '}
               <Link
-                href="/material-ui/getting-started/templates/sign-in/"
+                href="/"
                 variant="body2"
                 sx={{ alignSelf: 'center' }}
               >

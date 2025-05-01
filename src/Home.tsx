@@ -1,4 +1,3 @@
-// src/pages/Home.tsx
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import {
@@ -6,12 +5,26 @@ import {
   BsListCheck,
   BsPeopleFill,
 } from 'react-icons/bs';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  TextField,
+  Stack,
+} from '@mui/material';
 
 const Home: React.FC = () => {
-  const [projCount, setProjCount]   = useState<number | null>(null);
-  const [taskCount, setTaskCount]   = useState<number | null>(null);
-  const [userCount, setUserCount]   = useState<number | null>(null);
-  const [error, setError]           = useState('');
+  const [projCount, setProjCount] = useState<number | null>(null);
+  const [taskCount, setTaskCount] = useState<number | null>(null);
+  const [userCount, setUserCount] = useState<number | null>(null);
+  const [error, setError] = useState('');
+
+  /* ────────── Proje ekle modalı için durum ────────── */
+  const [open, setOpen] = useState(false);
+  const [projectName, setProjectName] = useState('');
+  const [projectDate, setProjectDate] = useState('');
 
   useEffect(() => {
     const token = localStorage.getItem('auth_token');
@@ -21,25 +34,34 @@ const Home: React.FC = () => {
       axios.get('/api/projects'),
       axios.get('/api/tasks'),
       axios.get('/api/users'),
-    ])
-      .then(([projRes, taskRes, userRes]) => {
-        if (projRes.status === 'fulfilled') setProjCount(projRes.value.data.length);
-        if (taskRes.status === 'fulfilled') setTaskCount(taskRes.value.data.length);
-        if (userRes.status === 'fulfilled') setUserCount(userRes.value.data.length);
+    ]).then(([p, t, u]) => {
+      if (p.status === 'fulfilled') setProjCount(p.value.data.length);
+      if (t.status === 'fulfilled') setTaskCount(t.value.data.length);
+      if (u.status === 'fulfilled') setUserCount(u.value.data.length);
+      [p, t, u].forEach((r) => {
+        if (r.status === 'rejected') setError('Veriler tam alınamadı.');
+      });
+    });
+  }, []);
 
-        // Hata yakala ama sayfa kısmen çalışmaya devam etsin
-        [projRes, taskRes, userRes].forEach((res) => {
-          if (res.status === 'rejected') {
-            console.error(res.reason);
-            setError('Veriler tam alınamadı.');
-          }
-        });
+  /* ────────── Proje ekle işlemi ────────── */
+  const handleSave = () => {
+    axios
+      .put('/api/projects', {
+        projectName,
+        projectDate, // yyyy-MM-dd bekleniyor
+      })
+      .then(() => {
+        setProjCount((c) => (c ?? 0) + 1); // sayacı anında güncelle
+        setOpen(false);
+        setProjectName('');
+        setProjectDate('');
       })
       .catch((err) => {
         console.error(err);
-        setError('Sayım yapılırken bir hata oluştu.');
+        alert(err.response?.data?.message || 'Proje eklenemedi');
       });
-  }, []);
+  };
 
   return (
     <main className="main-container">
@@ -50,6 +72,7 @@ const Home: React.FC = () => {
       {error && <p style={{ color: 'tomato' }}>{error}</p>}
 
       <div className="main-cards">
+        {/* PROJE SAYISI */}
         <div className="card">
           <div className="card-inner">
             <h3>PROJELER</h3>
@@ -58,6 +81,7 @@ const Home: React.FC = () => {
           <h1>{projCount ?? '...'}</h1>
         </div>
 
+        {/* GÖREV SAYISI */}
         <div className="card">
           <div className="card-inner">
             <h3>GÖREVLER</h3>
@@ -66,6 +90,7 @@ const Home: React.FC = () => {
           <h1>{taskCount ?? '...'}</h1>
         </div>
 
+        {/* ÇALIŞAN SAYISI */}
         <div className="card">
           <div className="card-inner">
             <h3>ÇALIŞANLAR</h3>
@@ -73,7 +98,42 @@ const Home: React.FC = () => {
           </div>
           <h1>{userCount ?? '...'}</h1>
         </div>
+
+        {/* ────────── “PROJE EKLE” KART-BUTONU ────────── */}
+        <button className="card add-card" onClick={() => setOpen(true)}>
+          <div className="card-inner" style={{ justifyContent: 'center' }}>
+            <h3>➕ PROJE&nbsp;EKLE</h3>
+          </div>
+        </button>
       </div>
+
+      {/* ────────── MODAL ────────── */}
+      <Dialog open={open} onClose={() => setOpen(false)}>
+        <DialogTitle>Yeni Proje</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2} sx={{ mt: 1, minWidth: 300 }}>
+            <TextField
+              label="Proje Adı"
+              fullWidth
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+            />
+            <TextField
+              label="Proje Tarihi"
+              type="date"
+              InputLabelProps={{ shrink: true }}
+              value={projectDate}
+              onChange={(e) => setProjectDate(e.target.value)}
+            />
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpen(false)}>İptal</Button>
+          <Button variant="contained" onClick={handleSave}>
+            Kaydet
+          </Button>
+        </DialogActions>
+      </Dialog>
     </main>
   );
 };
