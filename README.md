@@ -3,6 +3,8 @@
 
 Bu projede React + TS kullanılmıştır. 
 
+Projeyi `npm run dev` komutuyla çalıştırın.
+
 [Kullanıcı yetkileri ve erişimler](https://github.com/ahmetyuksektepe/proje-yonetim-sistemi-backend/blob/main/README.md)
 
 ## Ekran Görüntüleri
